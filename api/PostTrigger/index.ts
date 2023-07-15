@@ -25,20 +25,10 @@ module.exports = async function (context, req) {
         ssl: {ca: fs.readFileSync("DigiCertGlobalRootCA.crt.pem")}
     };
     const conn = await mysql.createConnection(config);
-    // thredのテーブルにthred_idとthred_nameを登録するクエリを作って
-    
-    // それを実行する
+    // thredのテーブルにthred_idとthred_nameを登録
     const [rows, fields] = await conn.execute(
-        'INSERT INTO thred (thred_id, thred_name) VALUES (?, ?)',
-        [1, 'test']
+        'INSERT INTO thred (thred_id, thred_name) VALUES (?, ?)'
     );
-    // これでthredテーブルにthred_idとthred_nameが登録される
-    // あとはこのthred_idを使って
-    // messageテーブルにmessage_idとmessageを登録するクエリを作って
-    // それを実行する
-    const [rows, fields] = await conn.execute(
-        'INSERT INTO message (message_id, message) VALUES (?, ?)',
-        [1, 'test']
-    );
+    //
 }
 
