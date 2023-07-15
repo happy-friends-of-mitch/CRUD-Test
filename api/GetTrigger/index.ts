@@ -25,7 +25,6 @@ module.exports = async function (context, req) {
         ssl: {ca: fs.readFileSync("DigiCertGlobalRootCA.crt.pem")}
     };
 // thredテーブルからthred_idとthred_nameをJSONファイルとして出力
-
     const conn = await mysql.createConnection(config);
     const [rows, fields] = await conn.execute(
         'SELECT thred_id, thred_name FROM thred'
@@ -33,4 +32,11 @@ module.exports = async function (context, req) {
     const thred = JSON.stringify(rows);
     fs.writeFileSync('thred.json', thred);
     context.log('thred.jsonにthredテーブルのデータを出力しました。');
+//megaテーブルからimg_url,reply_id,thred_id,thredテーブルからthred_nameをJSONファイルとして出力
+    const [rows2, fields2] = await conn.execute(
+        'SELECT mega.img_url, mega.reply_id, mega.thred_id, thred.thred_name FROM mega INNER JOIN thred ON mega.thred_id = thred.thred_id'
+    );
+    const mega = JSON.stringify(rows2);
+    fs.writeFileSync('mega.json', mega);
+    context.log('mega.jsonにmegaテーブルのデータを出力しました。');
 }
