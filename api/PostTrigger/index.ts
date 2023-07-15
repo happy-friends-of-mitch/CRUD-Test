@@ -1,7 +1,6 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions"
+module.exports = async function (context, req) {
+    context.log('JavaScript HTTP trigger function processed a request.');
 
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
-    context.log('HTTP trigger function processed a request.');
     const name = (req.query.name || (req.body && req.body.name));
     const responseMessage = name
         ? "Hello, " + name + ". This HTTP triggered function executed successfully."
@@ -11,7 +10,35 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         // status: 200, /* Defaults to 200 */
         body: responseMessage
     };
+    const mysql2 = require('mysql2');
+    const fs = require('fs');
+    const mysql = require('mysql2/promise');
 
-};
 
-export default httpTrigger;
+    var config =
+    {
+        host: process.env["MYSQL_HOST"],
+        user: process.env["MYSQL_USER"],
+        password: process.env["MYSQL_PASSWORD"],
+        database: process.env["MYSQL_DB"],
+        port: 3306,
+        ssl: {ca: fs.readFileSync("DigiCertGlobalRootCA.crt.pem")}
+    };
+    const conn = await mysql.createConnection(config);
+    // thredのテーブルにthred_idとthred_nameを登録するクエリを作って
+    
+    // それを実行する
+    const [rows, fields] = await conn.execute(
+        'INSERT INTO thred (thred_id, thred_name) VALUES (?, ?)',
+        [1, 'test']
+    );
+    // これでthredテーブルにthred_idとthred_nameが登録される
+    // あとはこのthred_idを使って
+    // messageテーブルにmessage_idとmessageを登録するクエリを作って
+    // それを実行する
+    const [rows, fields] = await conn.execute(
+        'INSERT INTO message (message_id, message) VALUES (?, ?)',
+        [1, 'test']
+    );
+}
+
