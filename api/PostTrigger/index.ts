@@ -28,7 +28,10 @@ module.exports = async function (context, req) {
     // thredのテーブルにthred_idとthred_nameを登録
     const [rows, fields] = await conn.execute(
         'INSERT INTO thred (thred_id, thred_name) VALUES (?, ?)'
-    );
+        );
+        // thred_idとthred_nameの擬似データを挿入
+        const thred_id = 1;
+        const thred_name = 'test';
     //megaテーブルにid,img_url,reply_id,thred_idを登録
     const [rows2, fields2] = await conn.execute(
         'INSERT INTO mega (id, img_url, reply_id, thred_id) VALUES (?, ?, ?, ?)'
