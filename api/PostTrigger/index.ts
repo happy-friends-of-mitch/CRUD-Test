@@ -5,7 +5,12 @@ interface ThreadInfo {
   thread_id: number;
   thread_name: string;
 }
-
+interface MegaInfo {
+    id: number;
+    img_url: string;
+    thred_id: number;
+    reply_id: number;
+  }
 async function registerThread(threadInfo: ThreadInfo): Promise<void> {
   try {
     const config = {
@@ -35,9 +40,9 @@ module.exports = async function (context, req) {
   context.log('JavaScript HTTP trigger function processed a request.');
 
   try {
-    // 擬似データ生成
-    const thread_id: number = Math.floor(Math.random() * 1000); // 0から999の間でランダムにthread_idを生成
-    const thread_name: string = `Thread ${thread_id}`; // thread_idを含むスレッド名を生成
+    // thread_idとthread_nameをリクエストボディから取得
+    const thread_id: number = req.body.thread_id;
+    const thread_name: string = req.body.thread_name;
 
     // threadのテーブルにスレッド情報を登録
     const threadInfo: ThreadInfo = { thread_id, thread_name };
