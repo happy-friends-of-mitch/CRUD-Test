@@ -42,10 +42,10 @@ module.exports = async function (context, req) {
     // どのコンテナを使うかを決める
     const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME;
     const containerClient = blobServiceClient.getContainerClient(containerName);
-    // const fileType:string = req.body.fileType;
+    const fileType:string = req.body.fileType;
     // ファイル名を決める
-    // const blobName:string = 'image-' + Date.now().toString() + "."+fileType;
-    const blobName:string = 'image-' + Date.now().toString() + ".jpeg";
+    const blobName:string = 'image-' + Date.now().toString() + "."+fileType;
+    // const blobName:string = 'image-' + Date.now().toString() + ".jpeg";
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
     // Base64エンコードされたデータを取得する

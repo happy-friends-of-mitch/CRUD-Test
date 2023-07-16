@@ -1,1 +1,7 @@
 # CRUD-Test
+functionで関数がない理由
+functionが通らないのは，pathの置き方だめ
+処理がapi直下なのにそういうふうになっていない
+yamlはステップごとにpathを指定しないとだめ
+
+それか一個あげる
