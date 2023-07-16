@@ -10,11 +10,8 @@ module.exports = async function (context, req) {
         // status: 200, /* Defaults to 200 */
         body: responseMessage
     };
-    const mysql2 = require('mysql2');
+    const mysql = require('mysql2');
     const fs = require('fs');
-    const mysql = require('mysql2/promise');
-
-
     var config =
     {
         host: process.env["MYSQL_HOST"],
@@ -27,11 +24,12 @@ module.exports = async function (context, req) {
     const conn = await mysql.createConnection(config);
     // thredのテーブルにthred_idとthred_nameを登録
     const [rows, fields] = await conn.execute(
-        'INSERT INTO thred (thred_id, thred_name) VALUES (?, ?)'
+        'INSERT INTO thred (thred_id, thred_name) VALUES (?, ?)',
+        [req.body.thred_id, req.body.thred_name]
         );
     //megaテーブルにid,img_url,reply_id,thred_idを登録
     const [rows2, fields2] = await conn.execute(
-        'INSERT INTO mega (id, img_url, reply_id, thred_id) VALUES (?, ?, ?, ?)'
+        'INSERT INTO mega (id, img_url, reply_id, thred_id) VALUES (?, ?, ?, ?)',
+        [req.body.id, req.body.img_url, req.body.reply_id, req.body.thred_id]
     );
 }
-

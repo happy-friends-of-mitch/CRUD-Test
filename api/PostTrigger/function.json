@@ -16,5 +16,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/PostTrigger/index.ts"
+  "scriptFile": "../dist/PostTrigger/index.js"
 }
