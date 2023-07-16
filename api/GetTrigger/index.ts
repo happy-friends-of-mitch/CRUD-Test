@@ -18,7 +18,7 @@ module.exports = async function (context, req) {
         // threadテーブルからthread_idとthread_nameをJSONファイルとして出力
         const conn = await mysql.createConnection(config);
         const [rows, fields] = await conn.execute(
-            'SELECT thread_id, thread_name FROM thread'
+            'SELECT thread_id, thread_name FROM thread WHERE thread_id = 1 ORDER BY thread_id'
             );
             const thread = JSON.stringify(rows);
             context.log(thread);

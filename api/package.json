@@ -11,6 +11,8 @@
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {
+    "@azure/identity": "^3.2.3",
+    "@azure/storage-blob": "^12.15.0",
     "mysql2": "^3.5.1"
   },
   "devDependencies": {

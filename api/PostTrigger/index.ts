@@ -1,13 +1,14 @@
 import * as fs from 'fs';
 import * as mysql from 'mysql2/promise';
+import { AzureFunction, Context, HttpRequest } from "@azure/functions"
+import { BlobServiceClient } from "@azure/storage-blob";
 
 interface MegaInfo {
-    id: number;
-    img_url: string;
+    img_url :string;
     thread_id: number;
-    reply_id: number;
+    reply_id: number; 
   }
-async function registerThread(MegaInfo: MegaInfo): Promise<void> {
+async function registerMega(MegaInfo: MegaInfo): Promise<void> {
   try {
     const config = {
       host: process.env["MYSQL_HOST"],
@@ -17,11 +18,12 @@ async function registerThread(MegaInfo: MegaInfo): Promise<void> {
       port: 3306,
       ssl: { ca: fs.readFileSync("DigiCertGlobalRootCA.crt.pem") }
     };
-
+   
+    console.log("img_upload")
     const conn = await mysql.createConnection(config);
     const [rows, fields] = await conn.execute(
-      'INSERT INTO mega (id, img_url,reply_id,thread_id) VALUES (?, ?, ?, ?)',
-      [MegaInfo.id, MegaInfo.img_url,MegaInfo.reply_id,MegaInfo.thread_id]
+      'INSERT INTO mega ( img_url,reply_id,thread_id) VALUES ( ?, ?, ?)',
+      [ MegaInfo.img_url,MegaInfo.reply_id,MegaInfo.thread_id]
     );
 
     console.log('megaテーブルにデータを登録しました。');
@@ -36,24 +38,42 @@ module.exports = async function (context, req) {
   context.log('JavaScript HTTP trigger function processed a request.');
 
   try {
-    // // thread_idとthread_nameをリクエストボディから取得
-    // const id: number = req.body.id;
-    // const img_url: string = req.body.img_url;
-    // const reply_id: number = req.body.reply_id;
-    // const thread_id: number = req.body.thread_id;
-    const id: number = Math.floor(Math.random() * 1000); // 0から999の間でランダムなidを生成
-    const img_url: string = 'https://example.com/image.jpg'; // 仮の画像URL
-    const reply_id: number = Math.floor(Math.random() * 1000); // 0から999の間でランダムなreply_idを生成
-    const thread_id: number = Math.floor(Math.random() * 1000); // 0から999の間でランダムなthread_idを生成
+    const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);
+    // どのコンテナを使うかを決める
+    const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME;
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    // const fileType:string = req.body.fileType;
+    // ファイル名を決める
+    // const blobName:string = 'image-' + Date.now().toString() + "."+fileType;
+    const blobName:string = 'image-' + Date.now().toString() + ".jpeg";
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+    // Base64エンコードされたデータを取得する
+    const data:string = req.body.image;
+    if (data) {
+        console.log("data is not null");
+    }
+    
+    // Base64エンコードされたデータをblobにアップロードする
+    const imageData = Buffer.from(data, 'base64');
+    await blockBlobClient.upload(imageData, imageData.length);
+    // thread_idとthread_nameをリクエストボディから取得
+    const img_url: string = blobName;
+    const reply_id: number = Number(req.body.reply_id);
+    const thread_id: number = Number(req.body.thread_id);
+    // const img_url: string = blobName;
+    // const reply_id: number = 1;
+    // const thread_id: number = 1;
+
     // megaのテーブルにスレッド情報を登録
-    const megaInfo: MegaInfo = { id, img_url,reply_id , thread_id};
-    await registerThread(megaInfo);
+    const megaInfo: MegaInfo = { img_url,reply_id , thread_id};
+    await registerMega(megaInfo);
 
     // 入力完了を出力
     console.log('入力が完了しました。');
     context.res = {
       status: 200,
-      body: "ok"
+      body: "Image&table uploaded"
     };
   } catch (error) {
     // ハンドルされていないエラーをキャッチしてログに出力
