@@ -22,14 +22,12 @@ module.exports = async function (context, req) {
             );
             const thread = JSON.stringify(rows);
             context.log(thread);
-            fs.writeFileSync('thread.json', thread);
             context.log('thread.jsonにthreadテーブルのデータを出力しました。');
     //megaテーブルからimg_url,reply_id,thread_id,threadテーブルからthread_nameをJSONファイルとして出力
     const [rows2, fields2] = await conn.execute(
         'SELECT mega.img_url, mega.reply_id, mega.thread_id, thread.thread_name FROM mega INNER JOIN thread ON mega.thread_id = thread.thread_id'
         );
         const mega = JSON.stringify(rows2);
-        fs.writeFileSync('mega.json', mega);
         context.log('mega.jsonにmegaテーブルのデータを出力しました。');  
         context.res = {
             // status: 200, /* Defaults to 200 */
